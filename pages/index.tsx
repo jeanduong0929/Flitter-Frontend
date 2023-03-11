@@ -7,10 +7,10 @@ import { toast } from "react-toastify";
 import tw from "tailwind-styled-components";
 
 const BackgroundImage = tw.div`
-  background-image: url(https://free4kwallpapers.com/uploads/originals/2022/03/23/-beautiful-sunset-with-a-rocket-wallpaper.png);
-  background-repeat: no-repeat;
-  background-size: cover;
-  height: 100vh;
+  bg-cover bg-no-repeat h-screen
+  bg-center
+  absolute top-0 left-0 w-full
+  backgroundImageUrl
 `;
 
 const Wrapper = tw.div`
@@ -37,6 +37,13 @@ const RegisterButton = tw(Button)`
   bg-teal-500
 `;
 
+const BORDER_WHITE = "border-4 border-white";
+const BORDER_RED = "border-4 border-red-500";
+const BORDER_GREEN = "border-4 border-green-500";
+
+/**
+ * Payload for registering a user
+ */
 type RegisterPayload = {
   username: string;
   password1: string;
@@ -56,14 +63,25 @@ const HomePage = () => {
   const { auth } = useContext(AuthContext);
   const router = useRouter();
 
+  /**
+   * Redirect to dashboard if user is already authenticated
+   */
   if (auth) {
     router.push("/dashboard");
   }
 
+  /**
+   * Get all usernames on component mount
+   */
   useEffect(() => {
     getAllUsernames();
   }, []);
 
+  /**
+   * Register a user
+   *
+   * @param e - Form submit event
+   */
   const handleRegister = async (
     e: React.FormEvent<HTMLFormElement>
   ): Promise<void> => {
@@ -84,6 +102,9 @@ const HomePage = () => {
     }
   };
 
+  /**
+   * Get all usernames
+   */
   const getAllUsernames = async (): Promise<void> => {
     try {
       const resp = await FLTTR.get("/users/usernames");
@@ -93,7 +114,12 @@ const HomePage = () => {
     }
   };
 
-  const handleUsername = (e: ChangeEvent<HTMLInputElement>): void => {
+  /**
+   * Handle change event for username input
+   *
+   * @param e - Change event object
+   */
+  const handleUsername = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setUsername(e.target.value);
 
     // if username is empty, set validUsername to false
@@ -116,8 +142,15 @@ const HomePage = () => {
     }
   };
 
-  const handlePassword = (e: ChangeEvent<HTMLInputElement>): void => {
+  /**
+   * Handle change event for password input
+   *
+   * @param e - Change event object
+   */
+  const handlePassword = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setPassword(e.target.value);
+
+    // Validate password
     if (e.target.value.length === 0) {
       setValidPassword(false);
     } else if (!isValidPassword(e.target.value)) {
@@ -126,18 +159,27 @@ const HomePage = () => {
       setValidPassword(true);
     }
 
+    // Validate confirm password
     if (!isSamePassword(e.target.value, confirmPassword)) {
       setValidConfirmPassword(false);
-    } else if (confirmPassword.length == 0) {
+    } else if (confirmPassword.length === 0) {
       setValidConfirmPassword(false);
     } else {
       setValidConfirmPassword(true);
     }
   };
 
-  const handleConfirmPassword = (e: ChangeEvent<HTMLInputElement>): void => {
+  /**
+   * Handle change event for confirm password input
+   *
+   * @param e - Change event object
+   */
+  const handleConfirmPassword = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ): void => {
     setConfirmPassword(e.target.value);
 
+    // Validate confirm password
     if (e.target.value.length === 0) {
       setValidConfirmPassword(false);
     } else if (!isSamePassword(password, e.target.value)) {
@@ -147,30 +189,64 @@ const HomePage = () => {
     }
   };
 
+  /**
+   * Perform binary search for a target string in a sorted array of strings
+   *
+   * @param usernames - Sorted array of strings to search
+   * @param target - Target string to search for
+   * @param start - Start index for the search
+   * @param end - End index for the search
+   * @returns - True if the target string is found, false otherwise
+   */
   const binarySearch = (
-    usernames: string[],
+    usernames: string[] | undefined,
     target: string,
     start: number,
     end: number
   ): boolean => {
-    if (start > end) return false;
-    const mid = Math.floor((start + end) / 2);
-    if (usernames[mid] === target) return true;
-    else if (usernames[mid] > target)
-      return binarySearch(usernames, target, start, mid - 1);
-    else return binarySearch(usernames, target, mid + 1, end);
+    while (start <= end) {
+      const mid = Math.floor((start + end) / 2);
+      const midValue = usernames?.[mid];
+      if (midValue === target) {
+        return true;
+      } else if (midValue && midValue > target) {
+        end = mid - 1;
+      } else {
+        start = mid + 1;
+      }
+    }
+    return false;
   };
 
+  /**
+   * Check if a username is valid
+   *
+   * @param username - Username to check
+   * @returns - True if the username is valid, false otherwise
+   */
   const isValidUsername = (username: string): boolean => {
     const regex = /^(?=[a-zA-Z0-9._]{8,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/;
     return regex.test(username);
   };
 
+  /**
+   * Check if a password is valid
+   *
+   * @param password - Password to check
+   * @returns - True if the password is valid, false otherwise
+   */
   const isValidPassword = (password: string): boolean => {
     const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
     return regex.test(password);
   };
 
+  /**
+   * Check if two passwords are the same
+   *
+   * @param password - First password to compare
+   * @param confirmPassword - Second password to compare
+   * @returns - True if the passwords are the same, false otherwise
+   */
   const isSamePassword = (
     password: string,
     confirmPassword: string
@@ -178,12 +254,20 @@ const HomePage = () => {
     return password === confirmPassword;
   };
 
+  /**
+   * Clear all input fields
+   */
   const clearInputs = (): void => {
     setUsername("");
     setPassword("");
     setConfirmPassword("");
   };
 
+  /**
+   * Display a success message using toast notification
+   *
+   * @param msg - Message to display
+   */
   const RegisterSuccess = (msg: string): void => {
     toast.success(msg, {
       position: "bottom-right",
@@ -197,6 +281,11 @@ const HomePage = () => {
     });
   };
 
+  /**
+   * Display an error message using toast notification
+   *
+   * @param msg - Message to display
+   */
   const RegisterFailed = (msg: string): void => {
     toast.error(msg, {
       position: "bottom-right",
@@ -210,6 +299,9 @@ const HomePage = () => {
     });
   };
 
+  /**
+   * If usernames is null, display loading message
+   */
   if (!usernames) return <div>Loading...</div>;
 
   return (
@@ -228,10 +320,10 @@ const HomePage = () => {
           <Username
             className={`${
               validUsername
-                ? "border-4 border-green-500"
+                ? BORDER_GREEN
                 : username.trim() === ""
-                ? "border-4 border-white"
-                : "border-4 border-red-500"
+                ? BORDER_WHITE
+                : BORDER_RED
             }`}
             type="text"
             placeholder="Username"
@@ -241,10 +333,10 @@ const HomePage = () => {
           <Password
             className={`${
               validPassword
-                ? "border-4 border-green-500"
+                ? BORDER_GREEN
                 : password.trim() === ""
-                ? "border-4 border-white"
-                : "border-4 border-red-500"
+                ? BORDER_WHITE
+                : BORDER_RED
             }`}
             type="password"
             placeholder="Password"
@@ -254,10 +346,10 @@ const HomePage = () => {
           <Password
             className={`${
               validConfirmPassword
-                ? "border-4 border-green-500"
+                ? BORDER_GREEN
                 : confirmPassword.trim() === ""
-                ? "border-4 border-white"
-                : "border-4 border-red-500"
+                ? BORDER_WHITE
+                : BORDER_RED
             }`}
             type="password"
             placeholder="Confirm Password"
