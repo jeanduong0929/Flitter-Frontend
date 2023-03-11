@@ -119,7 +119,7 @@ const HomePage = () => {
    *
    * @param e - Change event object
    */
-  const handleUsername = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleUsername = (e: ChangeEvent<HTMLInputElement>): void => {
     setUsername(e.target.value);
 
     // if username is empty, set validUsername to false
@@ -147,7 +147,7 @@ const HomePage = () => {
    *
    * @param e - Change event object
    */
-  const handlePassword = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handlePassword = (e: ChangeEvent<HTMLInputElement>): void => {
     setPassword(e.target.value);
 
     // Validate password
@@ -174,9 +174,7 @@ const HomePage = () => {
    *
    * @param e - Change event object
    */
-  const handleConfirmPassword = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ): void => {
+  const handleConfirmPassword = (e: ChangeEvent<HTMLInputElement>): void => {
     setConfirmPassword(e.target.value);
 
     // Validate confirm password
