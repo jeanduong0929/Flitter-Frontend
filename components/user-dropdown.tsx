@@ -31,16 +31,25 @@ const UnorderedList = tw.li`
 
 const Li = tw.li``;
 
+/**
+ * Props for UserDropdown component
+ */
 interface UserDropdownProps {
   userDropdown: boolean;
   setUserDropdown: (value: boolean) => void;
 }
 
+/**
+ * UserDropdown component
+ */
 const UserDropdown = ({ userDropdown, setUserDropdown }: UserDropdownProps) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { auth, setAuth } = useContext(AuthContext);
   const router = useRouter();
 
+  /**
+   * Close user dropdown when user clicks outside of it
+   */
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
       if (
@@ -58,11 +67,17 @@ const UserDropdown = ({ userDropdown, setUserDropdown }: UserDropdownProps) => {
     };
   }, [setUserDropdown]);
 
+  /**
+   * Go to profile page
+   */
   const handleGoToProfile = () => {
     setUserDropdown(false);
     router.push("/profile");
   };
 
+  /**
+   * Log out user
+   */
   const handleLogout = () => {
     setAuth(null);
     setUserDropdown(false);

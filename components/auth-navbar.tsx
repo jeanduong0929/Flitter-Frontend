@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import tw from "tailwind-styled-components";
 import LoginModal from "./login-modal";
 
@@ -20,6 +20,9 @@ const LoginButton = tw(Button)`
   bg-blue-500
 `;
 
+/**
+ * A component that renders the authentication navigation bar.
+ */
 const AuthNavbar = () => {
   const [loginModal, setLoginModal] = useState(false);
 

@@ -29,15 +29,26 @@ const LoginButton = tw(Button)`
   bg-teal-400
 `;
 
+/**
+ * Props for the LoginModal component.
+ */
 interface LoginModalProps {
   setLoginModal: (value: boolean) => void;
 }
 
+/**
+ * Payload for the login request.
+ */
 type LoginPayload = {
   username: string;
   password: string;
 };
 
+/**
+ * A modal dialog for the login form.
+ *
+ * @param setLoginModal A function to set the login modal state.
+ */
 const LoginModal = ({ setLoginModal }: LoginModalProps) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -45,6 +56,9 @@ const LoginModal = ({ setLoginModal }: LoginModalProps) => {
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
 
+  /**
+   * Handle a click outside of the login form to close the modal.
+   */
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (formRef.current && !formRef.current.contains(e.target as Node)) {
@@ -58,6 +72,11 @@ const LoginModal = ({ setLoginModal }: LoginModalProps) => {
     };
   }, [setLoginModal]);
 
+  /**
+   * Handle the login form submission.
+   *
+   * @param e The form submit event.
+   */
   const handleLogin = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
 
@@ -78,6 +97,11 @@ const LoginModal = ({ setLoginModal }: LoginModalProps) => {
     }
   };
 
+  /**
+   * Display a success toast message.
+   *
+   * @param msg The message to display.
+   */
   const loginSuccess = (msg: string): void => {
     toast.success(msg, {
       position: "bottom-right",
@@ -91,6 +115,11 @@ const LoginModal = ({ setLoginModal }: LoginModalProps) => {
     });
   };
 
+  /**
+   * Display an error toast message.
+   *
+   * @param msg The message to display.
+   */
   const loginFailed = (msg: string): void => {
     toast.error(msg, {
       position: "bottom-right",
