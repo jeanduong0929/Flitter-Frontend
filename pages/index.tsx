@@ -1,6 +1,8 @@
 import AuthNavbar from "@/components/auth-navbar";
+import { AuthContext } from "@/contexts/auth-provider";
 import FLTTR from "@/utils/axios-config";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import tw from "tailwind-styled-components";
 
@@ -50,6 +52,13 @@ const HomePage = () => {
   const [usernames, setUsernames] = useState<string[]>();
   const [validUsername, setValidUsername] = useState(false);
   const [validPassword, setValidPassword] = useState(false);
+  const [validConfirmPassword, setValidConfirmPassword] = useState(false);
+  const { auth } = useContext(AuthContext);
+  const router = useRouter();
+
+  if (auth) {
+    router.push("/dashboard");
+  }
 
   useEffect(() => {
     getAllUsernames();
@@ -84,7 +93,7 @@ const HomePage = () => {
     }
   };
 
-  const handleUsername = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleUsername = (e: ChangeEvent<HTMLInputElement>): void => {
     setUsername(e.target.value);
 
     // if username is empty, set validUsername to false
@@ -107,6 +116,37 @@ const HomePage = () => {
     }
   };
 
+  const handlePassword = (e: ChangeEvent<HTMLInputElement>): void => {
+    setPassword(e.target.value);
+    if (e.target.value.length === 0) {
+      setValidPassword(false);
+    } else if (!isValidPassword(e.target.value)) {
+      setValidPassword(false);
+    } else {
+      setValidPassword(true);
+    }
+
+    if (!isSamePassword(e.target.value, confirmPassword)) {
+      setValidConfirmPassword(false);
+    } else if (confirmPassword.length == 0) {
+      setValidConfirmPassword(false);
+    } else {
+      setValidConfirmPassword(true);
+    }
+  };
+
+  const handleConfirmPassword = (e: ChangeEvent<HTMLInputElement>): void => {
+    setConfirmPassword(e.target.value);
+
+    if (e.target.value.length === 0) {
+      setValidConfirmPassword(false);
+    } else if (!isSamePassword(password, e.target.value)) {
+      setValidConfirmPassword(false);
+    } else {
+      setValidConfirmPassword(true);
+    }
+  };
+
   const binarySearch = (
     usernames: string[],
     target: string,
@@ -121,14 +161,21 @@ const HomePage = () => {
     else return binarySearch(usernames, target, mid + 1, end);
   };
 
-  const isValidUsername = (username): boolean => {
+  const isValidUsername = (username: string): boolean => {
     const regex = /^(?=[a-zA-Z0-9._]{8,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/;
     return regex.test(username);
   };
 
-  const isValidPassword = (password): boolean => {
+  const isValidPassword = (password: string): boolean => {
     const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
     return regex.test(password);
+  };
+
+  const isSamePassword = (
+    password: string,
+    confirmPassword: string
+  ): boolean => {
+    return password === confirmPassword;
   };
 
   const clearInputs = (): void => {
@@ -183,7 +230,7 @@ const HomePage = () => {
               validUsername
                 ? "border-4 border-green-500"
                 : username.trim() === ""
-                ? "border-white"
+                ? "border-4 border-white"
                 : "border-4 border-red-500"
             }`}
             type="text"
@@ -192,16 +239,30 @@ const HomePage = () => {
             onChange={handleUsername}
           />
           <Password
+            className={`${
+              validPassword
+                ? "border-4 border-green-500"
+                : password.trim() === ""
+                ? "border-4 border-white"
+                : "border-4 border-red-500"
+            }`}
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={handlePassword}
           />
           <Password
+            className={`${
+              validConfirmPassword
+                ? "border-4 border-green-500"
+                : confirmPassword.trim() === ""
+                ? "border-4 border-white"
+                : "border-4 border-red-500"
+            }`}
             type="password"
             placeholder="Confirm Password"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={handleConfirmPassword}
           />
           <RegisterButton>Register</RegisterButton>
         </RegisterForm>

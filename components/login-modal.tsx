@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import tw from "tailwind-styled-components";
 import FLTTR from "@/utils/axios-config";
 import { AuthContext } from "@/contexts/auth-provider";
+import { toast } from "react-toastify";
 
 const Backdrop = tw.div`
   fixed bg-black opacity-50 inset-0 w-full h-full z-10
@@ -70,10 +71,37 @@ const LoginModal = ({ setLoginModal }: LoginModalProps) => {
       window.sessionStorage.setItem("auth", JSON.stringify(resp.data));
       setAuth(resp.data);
       setLoginModal(false);
+      loginSuccess("Login successful!");
       router.push("/dashboard");
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      loginFailed(error.response.data.Message);
     }
+  };
+
+  const loginSuccess = (msg: string): void => {
+    toast.success(msg, {
+      position: "bottom-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
+  };
+
+  const loginFailed = (msg: string): void => {
+    toast.error(msg, {
+      position: "bottom-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
   };
 
   return (
